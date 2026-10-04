@@ -254,9 +254,9 @@ export default function MalaysiaRealMap({
   };
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full" data-map-container="true" data-no-pull-refresh="true">
       {/* Real Map Canvas */}
-      <div ref={mapContainerRef} className="w-full h-full z-0" />
+      <div ref={mapContainerRef} className="w-full h-full z-0" data-map-container="true" data-no-pull-refresh="true" />
 
       {/* Floating HUD Controls */}
       <div className="absolute top-20 right-4 z-20 flex flex-col gap-2">

@@ -12,61 +12,122 @@ export default function PullToRefresh({ children }: PullToRefreshProps) {
   const [pullDistance, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const touchStartY = useRef(0);
+  const touchStartX = useRef(0);
   const isPulling = useRef(false);
 
-  const PULL_THRESHOLD = 70; // px to trigger reload
+  const PULL_THRESHOLD = 95; // px to trigger reload
 
   useEffect(() => {
     let startY = 0;
+    let startX = 0;
     let activeScrollable: HTMLElement | null = null;
 
+    const isInteractiveOrMap = (target: HTMLElement | null): boolean => {
+      if (!target) return false;
+      return !!target.closest(
+        '.leaflet-container, .leaflet-pane, .leaflet-tile, .leaflet-control, .leaflet-marker-icon, canvas, [data-map-viewport], [data-map-container], [data-no-pull-refresh], button, a, input, select, textarea, [role="button"], [role="dialog"]'
+      );
+    };
+
     const findScrollableParent = (el: HTMLElement | null): HTMLElement | null => {
-      while (el && el !== document.body) {
-        const overflowY = window.getComputedStyle(el).overflowY;
-        if ((overflowY === 'auto' || overflowY === 'scroll') && el.scrollHeight > el.clientHeight) {
-          return el;
+      let current = el;
+      while (current && current !== document.body && current !== document.documentElement) {
+        // Never treat map containers or canvas viewports as scrollable parents
+        if (
+          current.classList.contains('leaflet-container') ||
+          current.tagName.toLowerCase() === 'canvas' ||
+          current.getAttribute('data-map-viewport') ||
+          current.getAttribute('data-map-container')
+        ) {
+          return null;
         }
-        el = el.parentElement;
+
+        const style = window.getComputedStyle(current);
+        const overflowY = style.overflowY;
+        if (
+          (overflowY === 'auto' || overflowY === 'scroll') &&
+          current.scrollHeight > current.clientHeight + 15
+        ) {
+          return current;
+        }
+        current = current.parentElement;
       }
       return null;
     };
 
     const handleTouchStart = (e: TouchEvent) => {
       if (isRefreshing) return;
-      startY = e.touches[0].clientY;
-      touchStartY.current = startY;
 
-      // Find if touch started inside a scrolled element
-      activeScrollable = findScrollableParent(e.target as HTMLElement);
-      // Only allow pulling if scrollable is at the very top
-      if (activeScrollable && activeScrollable.scrollTop > 5) {
+      // Strictly single-finger gesture (ignore pinch-to-zoom gestures)
+      if (e.touches.length !== 1) {
+        isPulling.current = false;
+        setPullDistance(0);
+        return;
+      }
+
+      const target = e.target as HTMLElement | null;
+
+      // Never activate if touch starts inside map, canvas, button, or dialog
+      if (isInteractiveOrMap(target)) {
         isPulling.current = false;
         return;
       }
 
+      // Check if touch is within an active scrollable list/view (e.g. Journey Timeline, Gallery)
+      const scrollable = findScrollableParent(target);
+
+      // Pull-to-refresh ONLY allowed inside an actual scrollable container that is at the very top (scrollTop <= 2)
+      // On non-scrollable views (like the map viewport), pull-to-refresh MUST NOT activate
+      if (!scrollable || scrollable.scrollTop > 2) {
+        isPulling.current = false;
+        return;
+      }
+
+      activeScrollable = scrollable;
+      startY = e.touches[0].clientY;
+      startX = e.touches[0].clientX;
+      touchStartY.current = startY;
+      touchStartX.current = startX;
       isPulling.current = true;
     };
 
     const handleTouchMove = (e: TouchEvent) => {
       if (!isPulling.current || isRefreshing) return;
 
-      const currentY = e.touches[0].clientY;
-      const deltaY = currentY - startY;
-
-      // If scrollable element was scrolled down, cancel pull
-      if (activeScrollable && activeScrollable.scrollTop > 5) {
+      // Immediately cancel if a second finger touches the screen (pinch zoom)
+      if (e.touches.length !== 1) {
         isPulling.current = false;
         setPullDistance(0);
         return;
       }
 
-      if (deltaY > 0) {
-        // Apply rubber-band damping curve
-        const distance = Math.min(100, Math.pow(deltaY, 0.82));
+      const currentY = e.touches[0].clientY;
+      const currentX = e.touches[0].clientX;
+      const deltaY = currentY - startY;
+      const deltaX = currentX - startX;
+
+      // If user scrolls up or container scrolled down, cancel
+      if (activeScrollable && activeScrollable.scrollTop > 2) {
+        isPulling.current = false;
+        setPullDistance(0);
+        return;
+      }
+
+      // If motion is horizontal or diagonal (swiping sideways or diagonal pinch), cancel
+      if (Math.abs(deltaX) > Math.abs(deltaY) * 0.55) {
+        isPulling.current = false;
+        setPullDistance(0);
+        return;
+      }
+
+      // 45px initial deadzone: small slips or micro-drags do not trigger any pull visual
+      if (deltaY > 45) {
+        const pullTravel = deltaY - 45;
+        // Firm damping resistance: requires ~170px of deliberate downward drag to reach threshold
+        const distance = Math.min(115, Math.pow(pullTravel, 0.78) * 2.1);
         setPullDistance(distance);
 
-        // Prevent native overscroll glitching while pulling
-        if (deltaY > 15 && e.cancelable && (!activeScrollable || activeScrollable.scrollTop <= 0)) {
+        if (distance > 30 && e.cancelable) {
           e.preventDefault();
         }
       } else {
@@ -92,16 +153,21 @@ export default function PullToRefresh({ children }: PullToRefreshProps) {
       }
     };
 
+    const handleTouchCancel = () => {
+      isPulling.current = false;
+      setPullDistance(0);
+    };
+
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
     window.addEventListener('touchend', handleTouchEnd, { passive: true });
-    window.addEventListener('touchcancel', handleTouchEnd, { passive: true });
+    window.addEventListener('touchcancel', handleTouchCancel, { passive: true });
 
     return () => {
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
-      window.removeEventListener('touchcancel', handleTouchEnd);
+      window.removeEventListener('touchcancel', handleTouchCancel);
     };
   }, [pullDistance, isRefreshing]);
 

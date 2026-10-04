@@ -187,7 +187,7 @@ export default function SharedMemoryPage() {
   return (
     <main className="relative w-screen h-screen overflow-hidden bg-[#062c21]">
       {/* Map (Real or 3D) */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0" data-map-viewport="true" data-no-pull-refresh="true">
         {mapViewMode === 'real' ? (
           <MalaysiaRealMap
             memories={memories}

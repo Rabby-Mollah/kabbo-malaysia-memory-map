@@ -570,6 +570,8 @@ export default function Malaysia3DMap({
   return (
     <div
       ref={mountRef}
+      data-map-container="true"
+      data-no-pull-refresh="true"
       className="relative w-full h-full select-none overflow-hidden touch-none cursor-grab active:cursor-grabbing"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}

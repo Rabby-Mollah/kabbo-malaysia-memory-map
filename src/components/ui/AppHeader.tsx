@@ -80,11 +80,13 @@ export default function AppHeader({
 
         {/* Quick Refresh Button */}
         <button
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             soundEngine?.playChime('click');
             window.location.reload();
           }}
-          className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-full bg-lotus-greenDeep/90 hover:bg-lotus-green backdrop-blur-xl border border-lotus-blush/25 text-lotus-gold shadow-glass flex items-center justify-center transition-all"
+          data-no-pull-refresh="true"
+          className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-full bg-lotus-greenDeep/90 hover:bg-lotus-green backdrop-blur-xl border border-lotus-blush/25 text-lotus-gold shadow-glass flex items-center justify-center transition-all active:scale-95 touch-manipulation"
           title="Refresh page"
         >
           <RotateCcw className="w-3.5 h-3.5" />
