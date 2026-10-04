@@ -104,6 +104,25 @@ export default function SharedMemoryPage() {
     }
   }, [slug]);
 
+  // Global Button Click SFX & Auto-play initialization
+  useEffect(() => {
+    soundEngine?.initHeavenly();
+
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const clickable = target.closest('button, [role="button"], a[href]');
+      if (clickable) {
+        soundEngine?.playButtonClick();
+      }
+    };
+
+    window.addEventListener('click', handleGlobalClick, { capture: true });
+    return () => {
+      window.removeEventListener('click', handleGlobalClick, { capture: true });
+    };
+  }, []);
+
   const passportStamps = useMemo(() => computePassportStamps(memories), [memories]);
   const achievements = useMemo(() => computeAchievements(memories), [memories]);
 

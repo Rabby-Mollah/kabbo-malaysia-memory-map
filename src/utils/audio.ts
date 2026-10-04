@@ -2,214 +2,268 @@ import { AmbientSoundType } from '@/types';
 
 class SoundEngine {
   private ctx: AudioContext | null = null;
-  private currentType: AmbientSoundType = 'off';
-  private gainNode: GainNode | null = null;
-  private noiseNode: AudioNode | null = null;
-  private filterNode: BiquadFilterNode | null = null;
-  private lfoNode: OscillatorNode | null = null;
-  private isMuted: boolean = false;
-  private volume: number = 0.35;
-  private intervalId: number | null = null;
+  private heavenlyAudio: HTMLAudioElement | null = null;
+  private isMusicMuted: boolean = false;
+  private isMusicPlaying: boolean = false;
+  private lastClickTime: number = 0;
+  private listeners: Set<() => void> = new Set();
+  private volume: number = 0.5;
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      // Restore muted preference if previously set
+      const savedMute = localStorage.getItem('kabbo_music_muted');
+      if (savedMute !== null) {
+        this.isMusicMuted = savedMute === 'true';
+      }
+    }
+  }
 
   private initContext() {
+    if (typeof window === 'undefined') return;
     if (!this.ctx) {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      this.ctx = new AudioCtx();
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (AudioCtx) {
+        this.ctx = new AudioCtx();
+      }
     }
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume();
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
+  }
+
+  /**
+   * Initializes and plays "Cigarettes After Sex - Heavenly"
+   * Handles browser autoplay policy by listening for the first user interaction if blocked.
+   */
+  public initHeavenly() {
+    if (typeof window === 'undefined') return;
+    if (this.heavenlyAudio) return; // already initialized
+
+    try {
+      const audio = new Audio('/audio/heavenly.mp3');
+      audio.loop = true;
+      audio.volume = this.volume;
+      audio.muted = this.isMusicMuted;
+      audio.preload = 'auto';
+
+      // Fallback to high-availability CDN if local path fails
+      audio.addEventListener('error', () => {
+        console.warn('Local heavenly.mp3 failed, falling back to CDN stream');
+        audio.src =
+          'https://traffic.omny.fm/d/clips/bad5d079-8dcb-4630-8770-aa090049131d/32b2ac38-5a48-4300-9fa6-aa40002038b5/e94ce646-0a16-4e94-8112-aace0011e860/audio.mp3';
+        if (!this.isMusicMuted) {
+          audio.play().catch(() => {});
+        }
+      });
+
+      audio.addEventListener('play', () => {
+        this.isMusicPlaying = true;
+        this.notify();
+      });
+
+      audio.addEventListener('pause', () => {
+        this.isMusicPlaying = false;
+        this.notify();
+      });
+
+      this.heavenlyAudio = audio;
+
+      // Attempt immediate playback
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            this.isMusicPlaying = true;
+            this.notify();
+          })
+          .catch(() => {
+            // Autoplay was blocked by browser policy; wait for first interaction
+            this.isMusicPlaying = false;
+            this.notify();
+
+            const startOnInteraction = () => {
+              if (this.heavenlyAudio && !this.isMusicMuted) {
+                this.initContext();
+                this.heavenlyAudio.play().then(() => {
+                  this.isMusicPlaying = true;
+                  this.notify();
+                }).catch(() => {});
+              }
+              window.removeEventListener('pointerdown', startOnInteraction);
+              window.removeEventListener('touchstart', startOnInteraction);
+              window.removeEventListener('click', startOnInteraction);
+              window.removeEventListener('keydown', startOnInteraction);
+            };
+
+            window.addEventListener('pointerdown', startOnInteraction, { once: true, passive: true });
+            window.addEventListener('touchstart', startOnInteraction, { once: true, passive: true });
+            window.addEventListener('click', startOnInteraction, { once: true, passive: true });
+            window.addEventListener('keydown', startOnInteraction, { once: true, passive: true });
+          });
+      }
+    } catch (err) {
+      console.warn('Failed to initialize Heavenly audio:', err);
+    }
+  }
+
+  public toggleMute(): boolean {
+    this.isMusicMuted = !this.isMusicMuted;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('kabbo_music_muted', String(this.isMusicMuted));
+    }
+
+    if (this.heavenlyAudio) {
+      this.heavenlyAudio.muted = this.isMusicMuted;
+      if (!this.isMusicMuted && this.heavenlyAudio.paused) {
+        this.heavenlyAudio.play().then(() => {
+          this.isMusicPlaying = true;
+          this.notify();
+        }).catch(() => {});
+      }
+    }
+
+    this.notify();
+    return this.isMusicMuted;
+  }
+
+  public setMuted(muted: boolean) {
+    if (this.isMusicMuted !== muted) {
+      this.toggleMute();
+    }
+  }
+
+  public getMuted(): boolean {
+    return this.isMusicMuted;
+  }
+
+  public isPlaying(): boolean {
+    return this.isMusicPlaying && !this.isMusicMuted;
+  }
+
+  public playHeavenly() {
+    if (this.heavenlyAudio) {
+      this.isMusicMuted = false;
+      this.heavenlyAudio.muted = false;
+      this.heavenlyAudio.play().then(() => {
+        this.isMusicPlaying = true;
+        this.notify();
+      }).catch(() => {});
+    }
+  }
+
+  public pauseHeavenly() {
+    if (this.heavenlyAudio) {
+      this.heavenlyAudio.pause();
+      this.isMusicPlaying = false;
+      this.notify();
     }
   }
 
   public setVolume(vol: number) {
     this.volume = Math.max(0, Math.min(1, vol));
-    if (this.gainNode && this.ctx) {
-      this.gainNode.gain.setTargetAtTime(this.isMuted ? 0 : this.volume, this.ctx.currentTime, 0.1);
+    if (this.heavenlyAudio) {
+      this.heavenlyAudio.volume = this.volume;
     }
   }
 
-  public toggleMute(): boolean {
-    this.isMuted = !this.isMuted;
-    if (this.gainNode && this.ctx) {
-      this.gainNode.gain.setTargetAtTime(this.isMuted ? 0 : this.volume, this.ctx.currentTime, 0.1);
+  public subscribe(callback: () => void): () => void {
+    this.listeners.add(callback);
+    return () => {
+      this.listeners.delete(callback);
+    };
+  }
+
+  private notify() {
+    this.listeners.forEach((listener) => {
+      try {
+        listener();
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  }
+
+  /**
+   * Crisp, tactile UI button click SFX (soft marimba / glass haptic tap)
+   */
+  public playButtonClick() {
+    try {
+      this.initContext();
+      if (!this.ctx || this.isMusicMuted) return;
+
+      const now = this.ctx.currentTime;
+      // Debounce rapid multi-events within 30ms
+      if (now - this.lastClickTime < 0.03) return;
+      this.lastClickTime = now;
+
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      // Subtle organic pitch variation
+      const baseFreq = 920 + (Math.random() * 80 - 40);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(baseFreq, now);
+      osc.frequency.exponentialRampToValueAtTime(320, now + 0.035);
+
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.04);
+    } catch {
+      // AudioContext not allowed or uninitialized yet
     }
-    return this.isMuted;
   }
 
-  public getMuted(): boolean {
-    return this.isMuted;
-  }
-
-  public getCurrentType(): AmbientSoundType {
-    return this.currentType;
-  }
-
-  public stop() {
-    if (this.intervalId !== null) {
-      window.clearInterval(this.intervalId);
-      this.intervalId = null;
-    }
-    if (this.gainNode && this.ctx) {
-      this.gainNode.gain.setTargetAtTime(0, this.ctx.currentTime, 0.15);
-      setTimeout(() => {
-        try {
-          this.noiseNode?.disconnect();
-          this.filterNode?.disconnect();
-          this.lfoNode?.stop();
-          this.lfoNode?.disconnect();
-        } catch {
-          // cleanup
-        }
-        this.noiseNode = null;
-        this.filterNode = null;
-        this.lfoNode = null;
-      }, 200);
-    }
-    this.currentType = 'off';
-  }
-
-  public play(type: AmbientSoundType) {
-    if (type === 'off') {
-      this.stop();
+  /**
+   * Plays specific thematic sound effects
+   */
+  public playChime(kind: 'pin' | 'achievement' | 'click' | 'stamp') {
+    if (kind === 'click') {
+      this.playButtonClick();
       return;
     }
 
     try {
       this.initContext();
-      if (!this.ctx) return;
-
-      this.stop();
-      this.currentType = type;
-
-      const bufferSize = this.ctx.sampleRate * 2;
-      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-
-      // Pink / brown noise generator
-      let lastOut = 0.0;
-      for (let i = 0; i < bufferSize; i++) {
-        const white = Math.random() * 2 - 1;
-        data[i] = (lastOut + 0.02 * white) / 1.02;
-        lastOut = data[i];
-      }
-
-      const noiseSource = this.ctx.createBufferSource();
-      noiseSource.buffer = buffer;
-      noiseSource.loop = true;
-
-      const filter = this.ctx.createBiquadFilter();
-      const gain = this.ctx.createGain();
-      gain.gain.setValueAtTime(0, this.ctx.currentTime);
-      gain.gain.setTargetAtTime(this.isMuted ? 0 : this.volume, this.ctx.currentTime + 0.05, 0.4);
-
-      if (type === 'rain') {
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(1100, this.ctx.currentTime);
-        filter.Q.setValueAtTime(1.5, this.ctx.currentTime);
-
-        noiseSource.connect(filter);
-        filter.connect(gain);
-      } else if (type === 'ocean') {
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(450, this.ctx.currentTime);
-        filter.Q.setValueAtTime(2.0, this.ctx.currentTime);
-
-        // LFO for periodic wave swell
-        const lfo = this.ctx.createOscillator();
-        const lfoGain = this.ctx.createGain();
-        lfo.type = 'sine';
-        lfo.frequency.setValueAtTime(0.12, this.ctx.currentTime); // ~8 sec ocean swell
-        lfoGain.gain.setValueAtTime(320, this.ctx.currentTime);
-
-        lfo.connect(filter.frequency);
-        lfo.start();
-        this.lfoNode = lfo;
-
-        noiseSource.connect(filter);
-        filter.connect(gain);
-      } else if (type === 'tropical') {
-        filter.type = 'bandpass';
-        filter.frequency.setValueAtTime(1800, this.ctx.currentTime);
-        filter.Q.setValueAtTime(3.0, this.ctx.currentTime);
-
-        noiseSource.connect(filter);
-        filter.connect(gain);
-
-        // Periodic pleasant chirps
-        this.intervalId = window.setInterval(() => {
-          if (!this.ctx || this.currentType !== 'tropical' || this.isMuted) return;
-          const osc = this.ctx.createOscillator();
-          const oscGain = this.ctx.createGain();
-          osc.type = 'sine';
-          const baseFreq = 2400 + Math.random() * 1200;
-          osc.frequency.setValueAtTime(baseFreq, this.ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(baseFreq + 600, this.ctx.currentTime + 0.12);
-
-          oscGain.gain.setValueAtTime(0, this.ctx.currentTime);
-          oscGain.gain.linearRampToValueAtTime(0.04 * this.volume, this.ctx.currentTime + 0.04);
-          oscGain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.25);
-
-          osc.connect(oscGain);
-          oscGain.connect(this.ctx.destination);
-          osc.start();
-          osc.stop(this.ctx.currentTime + 0.28);
-        }, 3500);
-      } else if (type === 'night') {
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(300, this.ctx.currentTime);
-        filter.Q.setValueAtTime(0.8, this.ctx.currentTime);
-
-        noiseSource.connect(filter);
-        filter.connect(gain);
-      }
-
-      gain.connect(this.ctx.destination);
-      noiseSource.start();
-
-      this.gainNode = gain;
-      this.filterNode = filter;
-      this.noiseNode = noiseSource;
-    } catch (err) {
-      console.warn("Web Audio ambient init error:", err);
-    }
-  }
-
-  // Play a soft bell/chime for achievement unlock or pin drop
-  public playChime(kind: 'pin' | 'achievement' | 'click' | 'stamp') {
-    try {
-      this.initContext();
-      if (!this.ctx || this.isMuted) return;
+      if (!this.ctx || this.isMusicMuted) return;
 
       const now = this.ctx.currentTime;
       if (kind === 'stamp') {
-        // Deep satisfying thud + mechanical rubber stamp sound
+        // Deep rubber stamp thud
         const osc = this.ctx.createOscillator();
         const g = this.ctx.createGain();
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(140, now);
         osc.frequency.exponentialRampToValueAtTime(45, now + 0.12);
-        g.gain.setValueAtTime(0.3, now);
+        g.gain.setValueAtTime(0.28, now);
         g.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
         osc.connect(g);
         g.connect(this.ctx.destination);
         osc.start(now);
         osc.stop(now + 0.16);
       } else if (kind === 'pin') {
-        // Gentle water drop / marimba pop
+        // Gentle water drop marimba pop
         const osc = this.ctx.createOscillator();
         const g = this.ctx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(587.33, now); // D5
         osc.frequency.exponentialRampToValueAtTime(880, now + 0.08); // A5
-        g.gain.setValueAtTime(0.2, now);
-        g.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        g.gain.setValueAtTime(0.18, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
         osc.connect(g);
         g.connect(this.ctx.destination);
         osc.start(now);
-        osc.stop(now + 0.26);
+        osc.stop(now + 0.24);
       } else if (kind === 'achievement') {
-        // Golden arpeggio: C5 - E5 - G5 - C6
-        const freqs = [523.25, 659.25, 783.99, 1046.50];
+        // Ascending harmonic chime: C5 - E5 - G5 - C6
+        const freqs = [523.25, 659.25, 783.99, 1046.5];
         freqs.forEach((freq, idx) => {
           if (!this.ctx) return;
           const osc = this.ctx.createOscillator();
@@ -218,30 +272,26 @@ class SoundEngine {
           osc.type = 'sine';
           osc.frequency.setValueAtTime(freq, noteTime);
           g.gain.setValueAtTime(0, noteTime);
-          g.gain.linearRampToValueAtTime(0.2, noteTime + 0.02);
+          g.gain.linearRampToValueAtTime(0.18, noteTime + 0.02);
           g.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.4);
           osc.connect(g);
           g.connect(this.ctx.destination);
           osc.start(noteTime);
           osc.stop(noteTime + 0.42);
         });
-      } else {
-        // Subtle soft UI tap
-        const osc = this.ctx.createOscillator();
-        const g = this.ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(800, now);
-        g.gain.setValueAtTime(0.08, now);
-        g.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-        osc.connect(g);
-        g.connect(this.ctx.destination);
-        osc.start(now);
-        osc.stop(now + 0.06);
       }
     } catch {
       // ignore
     }
   }
+
+  // Legacy ambient compatibility stubs
+  public getCurrentType(): AmbientSoundType {
+    return 'off';
+  }
+  public stop() {}
+  public play(_type: AmbientSoundType) {}
 }
 
-export const soundEngine = typeof window !== 'undefined' ? new SoundEngine() : (null as unknown as SoundEngine);
+export const soundEngine =
+  typeof window !== 'undefined' ? new SoundEngine() : (null as unknown as SoundEngine);

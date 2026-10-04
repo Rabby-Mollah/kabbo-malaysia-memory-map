@@ -119,12 +119,33 @@ function MainContent() {
     });
   }, [travelerParam]);
 
+  // Global Button Click SFX & Auto-play initialization
+  useEffect(() => {
+    soundEngine?.initHeavenly();
+
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      // Triggers for buttons, clickable elements, or links
+      const clickable = target.closest('button, [role="button"], a[href]');
+      if (clickable) {
+        soundEngine?.playButtonClick();
+      }
+    };
+
+    window.addEventListener('click', handleGlobalClick, { capture: true });
+    return () => {
+      window.removeEventListener('click', handleGlobalClick, { capture: true });
+    };
+  }, []);
+
   // Derived calculations
   const passportStamps = useMemo(() => computePassportStamps(memories), [memories]);
   const achievements = useMemo(() => computeAchievements(memories), [memories]);
 
   // Handlers
   const handleStartJourney = () => {
+    soundEngine?.playHeavenly();
     setIsLandingMode(false);
     setActiveTab('map');
   };

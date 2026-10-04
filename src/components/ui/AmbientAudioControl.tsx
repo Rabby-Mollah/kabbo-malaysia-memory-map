@@ -1,127 +1,78 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Volume2, VolumeX, CloudRain, Waves, Trees, Moon } from 'lucide-react';
+import { Volume2, VolumeX, Music } from 'lucide-react';
 import { soundEngine } from '@/utils/audio';
-import { AmbientSoundType } from '@/types';
 
 export default function AmbientAudioControl() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [activeSound, setActiveSound] = useState<AmbientSoundType>('off');
   const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolume] = useState(0.4);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    if (soundEngine) {
-      setActiveSound(soundEngine.getCurrentType());
+    if (!soundEngine) return;
+
+    // Initialize Heavenly music on page load
+    soundEngine.initHeavenly();
+
+    const updateState = () => {
       setIsMuted(soundEngine.getMuted());
-    }
+      setIsPlaying(soundEngine.isPlaying());
+    };
+
+    updateState();
+    const unsubscribe = soundEngine.subscribe(updateState);
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
-  const handleSelectSound = (type: AmbientSoundType) => {
-    if (activeSound === type) {
-      soundEngine?.stop();
-      setActiveSound('off');
-    } else {
-      soundEngine?.play(type);
-      setActiveSound(type);
-      setIsMuted(false);
-    }
-  };
-
-  const handleToggleMute = () => {
-    const muted = soundEngine?.toggleMute() ?? false;
+  const handleToggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!soundEngine) return;
+    const muted = soundEngine.toggleMute();
     setIsMuted(muted);
+    setIsPlaying(soundEngine.isPlaying());
   };
-
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseFloat(e.target.value);
-    setVolume(val);
-    soundEngine?.setVolume(val);
-  };
-
-  const soundOptions = [
-    { id: 'tropical', label: 'Rainforest', icon: Trees, desc: 'Jungle rustle & birds' },
-    { id: 'ocean', label: 'Andaman Sea', icon: Waves, desc: 'Gentle coastal swell' },
-    { id: 'rain', label: 'Tropical Rain', icon: CloudRain, desc: 'Warm island showers' },
-    { id: 'night', label: 'City Dusk', icon: Moon, desc: 'Warm ambient glow' },
-  ];
 
   return (
-    <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-md border text-xs font-medium transition-all shadow-glass ${
-          activeSound !== 'off'
-            ? 'bg-lotus-pine text-lotus-cream border-lotus-gold/60 ring-2 ring-lotus-gold/30'
-            : 'bg-lotus-forest/80 hover:bg-lotus-forest text-lotus-cream/80 border-lotus-rose/20'
-        }`}
-        title="Ambient Sounds"
-      >
-        {isMuted || activeSound === 'off' ? (
-          <VolumeX className="w-4 h-4 text-lotus-cream/60" />
-        ) : (
-          <Volume2 className="w-4 h-4 text-lotus-gold animate-pulse" />
-        )}
-        <span className="hidden sm:inline">
-          {activeSound === 'off' ? 'Ambience' : soundOptions.find((s) => s.id === activeSound)?.label}
-        </span>
-      </button>
-
-      {isOpen && (
-        <div className="absolute right-0 top-11 w-64 p-3.5 rounded-2xl bg-lotus-forest/95 backdrop-blur-xl border border-lotus-rose/25 shadow-glass-lg z-50 text-lotus-cream animate-fade-in">
-          <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-lotus-rose/15">
-            <span className="text-xs font-semibold uppercase tracking-wider text-lotus-gold">
-              Malaysian Atmosphere
-            </span>
-            <button
-              onClick={handleToggleMute}
-              className="text-xs text-lotus-cream/60 hover:text-white flex items-center gap-1"
-            >
-              {isMuted ? 'Unmute' : 'Mute'}
-            </button>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 mb-3">
-            {soundOptions.map((opt) => {
-              const Icon = opt.icon;
-              const isCurrent = activeSound === opt.id;
-              return (
-                <button
-                  key={opt.id}
-                  onClick={() => handleSelectSound(opt.id as AmbientSoundType)}
-                  className={`flex flex-col items-start p-2 rounded-xl border text-left transition-all ${
-                    isCurrent
-                      ? 'bg-lotus-pine border-lotus-gold text-lotus-cream shadow-sm'
-                      : 'bg-white/5 hover:bg-white/10 border-lotus-rose/15 text-lotus-cream/70'
-                  }`}
-                >
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <Icon className={`w-3.5 h-3.5 ${isCurrent ? 'text-lotus-gold' : 'text-lotus-cream/60'}`} />
-                    <span className="text-xs font-medium">{opt.label}</span>
-                  </div>
-                  <span className="text-[10px] text-lotus-cream/50 leading-tight">{opt.desc}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {activeSound !== 'off' && (
-            <div className="flex items-center gap-2 pt-2 border-t border-lotus-rose/15">
-              <span className="text-[10px] text-lotus-cream/50 uppercase">Volume</span>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                value={volume}
-                onChange={handleVolumeChange}
-                className="w-full accent-lotus-gold h-1.5 rounded-lg bg-white/20 cursor-pointer"
-              />
-            </div>
-          )}
+    <button
+      onClick={handleToggleMute}
+      type="button"
+      className={`group relative flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full backdrop-blur-xl border text-xs font-medium transition-all shadow-glass active:scale-95 ${
+        !isMuted && isPlaying
+          ? 'bg-lotus-green text-lotus-cream border-lotus-gold/60 ring-2 ring-lotus-gold/25 shadow-gold-glow'
+          : 'bg-lotus-greenDeep/90 hover:bg-lotus-green text-lotus-cream/70 border-lotus-blush/25'
+      }`}
+      title={
+        isMuted
+          ? 'Unmute Cigarettes After Sex - Heavenly'
+          : 'Mute Cigarettes After Sex - Heavenly'
+      }
+    >
+      {/* Dynamic Soundwave / Mute Icon */}
+      {!isMuted && isPlaying ? (
+        <div className="flex items-center gap-[2px] h-3.5 px-0.5">
+          <span className="w-0.5 h-2.5 bg-lotus-gold rounded-full animate-pulse" />
+          <span className="w-0.5 h-3.5 bg-lotus-goldLight rounded-full animate-pulse [animation-delay:150ms]" />
+          <span className="w-0.5 h-2 bg-lotus-gold rounded-full animate-pulse [animation-delay:300ms]" />
         </div>
+      ) : isMuted ? (
+        <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-lotus-rose/80" />
+      ) : (
+        <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-lotus-gold" />
       )}
-    </div>
+
+      {/* Song title label */}
+      <span className="text-[11px] sm:text-xs font-serif font-medium tracking-tight">
+        {!isMuted && isPlaying ? (
+          <>
+            <span className="text-lotus-gold font-semibold">Heavenly</span>
+            <span className="text-lotus-blush/80 hidden md:inline ml-1">• CAS</span>
+          </>
+        ) : (
+          <span className="text-lotus-cream/60">Music Muted</span>
+        )}
+      </span>
+    </button>
   );
 }
