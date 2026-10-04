@@ -27,11 +27,11 @@ export const metadata: Metadata = {
   },
 };
 
+import PullToRefresh from "@/components/ui/PullToRefresh";
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   themeColor: "#062c21",
 };
 
@@ -42,8 +42,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${playfair.variable} ${jakarta.variable}`}>
-      <body className="antialiased bg-[#062c21] select-none text-slate-100 overflow-hidden w-screen h-screen">
-        {children}
+      <body className="antialiased bg-[#062c21] select-none text-slate-100 w-screen h-screen overflow-hidden">
+        <PullToRefresh>{children}</PullToRefresh>
       </body>
     </html>
   );

@@ -78,6 +78,18 @@ export default function AppHeader({
           <span className="hidden md:inline">Share</span>
         </button>
 
+        {/* Quick Refresh Button */}
+        <button
+          onClick={() => {
+            soundEngine?.playChime('click');
+            window.location.reload();
+          }}
+          className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-full bg-lotus-greenDeep/90 hover:bg-lotus-green backdrop-blur-xl border border-lotus-blush/25 text-lotus-gold shadow-glass flex items-center justify-center transition-all"
+          title="Refresh page"
+        >
+          <RotateCcw className="w-3.5 h-3.5" />
+        </button>
+
         {/* Complete Journey CTA button with Lotus Rose Gradient */}
         <button
           onClick={() => {
