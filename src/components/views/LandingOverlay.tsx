@@ -29,7 +29,7 @@ export default function LandingOverlay({
         <div className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-lotus-greenDeep/90 backdrop-blur-xl border border-lotus-blush/30 text-lotus-cream shadow-glass">
           <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-lotus-rose animate-pulse" />
           <span className="text-[10px] sm:text-xs uppercase tracking-widest font-semibold text-lotus-blush">
-            🌸 Digital Keepsake • Sacred Botanical Edition
+            🌸 2026 Malaysia Tour
           </span>
         </div>
 
