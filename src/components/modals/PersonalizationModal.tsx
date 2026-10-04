@@ -34,7 +34,7 @@ export default function PersonalizationModal({
   const [imgbbKey, setImgbbKey] = useState('');
   const [supabaseUrl, setSupabaseUrl] = useState('');
   const [supabaseKey, setSupabaseKey] = useState('');
-  const [cloudSaved, setCloudSaved] = useState(false);
+  const [showDevKeys, setShowDevKeys] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -42,6 +42,7 @@ export default function PersonalizationModal({
       const supa = getSupabaseConfig();
       setSupabaseUrl(supa.url);
       setSupabaseKey(supa.key);
+      setShowDevKeys(false); // Hidden by default
     }
   }, [isOpen]);
 
@@ -73,10 +74,10 @@ export default function PersonalizationModal({
         <div className="flex items-center justify-between border-b border-lotus-rose/15 pb-3">
           <div>
             <span className="text-xs font-semibold uppercase tracking-wider text-lotus-gold">
-              Keepsake Settings & Cloud
+              Personal Keepsake
             </span>
             <h2 className="text-xl sm:text-2xl font-serif font-bold text-lotus-cream">
-              Personalize & Cloud Access
+              Personalize Keepsake
             </h2>
           </div>
           <button
@@ -149,56 +150,69 @@ export default function PersonalizationModal({
             />
           </div>
 
-          {/* Cloud & API Keys Integration */}
-          <div className="p-4 rounded-2xl bg-white/5 border border-lotus-rose/20 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-lotus-gold flex items-center gap-1.5">
-                <Database className="w-3.5 h-3.5" />
-                <span>Cloud Storage & ImgBB Access</span>
-              </span>
-              <span className="text-[10px] text-lotus-blush font-medium">Active</span>
-            </div>
+          {/* Hidden Developer Cloud Keys (Collapsible, hidden by default) */}
+          <div className="pt-1">
+            <button
+              type="button"
+              onClick={() => setShowDevKeys(!showDevKeys)}
+              className="text-[11px] text-lotus-cream/40 hover:text-lotus-cream/80 flex items-center gap-1.5 transition-colors py-1"
+            >
+              <Key className="w-3 h-3 text-lotus-gold/60" />
+              <span>{showDevKeys ? '▲ Hide Developer Cloud Keys' : '⚙️ Developer Cloud Settings'}</span>
+            </button>
 
-            {/* ImgBB API Key */}
-            <div className="space-y-1">
-              <label className="text-[11px] text-lotus-cream/70 flex items-center justify-between">
-                <span className="flex items-center gap-1">
-                  <ImageIcon className="w-3 h-3 text-lotus-rose" />
-                  <span>ImgBB API Key (https://api.imgbb.com/)</span>
-                </span>
-              </label>
-              <input
-                type="text"
-                placeholder="Paste ImgBB API key..."
-                value={imgbbKey}
-                onChange={(e) => setImgbbKey(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-lotus-forest border border-lotus-rose/25 text-lotus-cream text-xs focus:outline-none focus:border-lotus-gold font-mono"
-              />
-            </div>
+            {showDevKeys && (
+              <div className="mt-2 p-4 rounded-2xl bg-black/40 border border-lotus-rose/25 space-y-3 animate-fade-in">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-lotus-gold flex items-center gap-1.5">
+                    <Database className="w-3.5 h-3.5" />
+                    <span>Cloud Storage & ImgBB Config</span>
+                  </span>
+                  <span className="text-[10px] text-lotus-blush font-medium">Configured</span>
+                </div>
 
-            {/* Supabase URL & Key */}
-            <div className="space-y-1">
-              <label className="text-[11px] text-lotus-cream/70 flex items-center gap-1">
-                <Key className="w-3 h-3 text-lotus-gold" />
-                <span>Supabase URL & Anon Key</span>
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <input
-                  type="text"
-                  placeholder="https://xyz.supabase.co"
-                  value={supabaseUrl}
-                  onChange={(e) => setSupabaseUrl(e.target.value)}
-                  className="w-full px-2.5 py-1.5 rounded-xl bg-lotus-forest border border-lotus-rose/25 text-lotus-cream text-[11px] focus:outline-none focus:border-lotus-gold font-mono"
-                />
-                <input
-                  type="password"
-                  placeholder="Supabase Anon Key..."
-                  value={supabaseKey}
-                  onChange={(e) => setSupabaseKey(e.target.value)}
-                  className="w-full px-2.5 py-1.5 rounded-xl bg-lotus-forest border border-lotus-rose/25 text-lotus-cream text-[11px] focus:outline-none focus:border-lotus-gold font-mono"
-                />
+                {/* ImgBB API Key */}
+                <div className="space-y-1">
+                  <label className="text-[11px] text-lotus-cream/70 flex items-center justify-between">
+                    <span className="flex items-center gap-1">
+                      <ImageIcon className="w-3 h-3 text-lotus-rose" />
+                      <span>ImgBB API Key</span>
+                    </span>
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="Paste ImgBB API key..."
+                    value={imgbbKey}
+                    onChange={(e) => setImgbbKey(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-lotus-forest border border-lotus-rose/25 text-lotus-cream text-xs focus:outline-none focus:border-lotus-gold font-mono"
+                  />
+                </div>
+
+                {/* Supabase URL & Key */}
+                <div className="space-y-1">
+                  <label className="text-[11px] text-lotus-cream/70 flex items-center gap-1">
+                    <Key className="w-3 h-3 text-lotus-gold" />
+                    <span>Supabase URL & Anon Key</span>
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      placeholder="https://xyz.supabase.co"
+                      value={supabaseUrl}
+                      onChange={(e) => setSupabaseUrl(e.target.value)}
+                      className="w-full px-2.5 py-1.5 rounded-xl bg-lotus-forest border border-lotus-rose/25 text-lotus-cream text-[11px] focus:outline-none focus:border-lotus-gold font-mono"
+                    />
+                    <input
+                      type="password"
+                      placeholder="Supabase Anon Key..."
+                      value={supabaseKey}
+                      onChange={(e) => setSupabaseKey(e.target.value)}
+                      className="w-full px-2.5 py-1.5 rounded-xl bg-lotus-forest border border-lotus-rose/25 text-lotus-cream text-[11px] focus:outline-none focus:border-lotus-gold font-mono"
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Quick Demo Helpers for Requirement 22 Empty State & Default Trip */}
