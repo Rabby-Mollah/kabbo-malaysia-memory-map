@@ -7,11 +7,13 @@ import { soundEngine } from '@/utils/audio';
 interface EmptyStateOverlayProps {
   onAddFirstMemory: () => void;
   friendName: string;
+  onExploreMap?: () => void;
 }
 
 export default function EmptyStateOverlay({
   onAddFirstMemory,
   friendName,
+  onExploreMap,
 }: EmptyStateOverlayProps) {
   return (
     <div className="absolute inset-0 pointer-events-none z-20 flex items-center justify-center p-4">
@@ -33,19 +35,33 @@ export default function EmptyStateOverlay({
         </div>
 
         <p className="text-xs text-lotus-cream/70 leading-relaxed max-w-xs mx-auto">
-          Explore the 3D islands below. As you pin locations, taste dishes, and take photos, the map will blossom into your personal Malaysian story.
+          Explore Malaysia on the interactive map below. As you pin locations, taste dishes, and save photos, the map will blossom into your personal Malaysian story.
         </p>
 
-        <button
-          onClick={() => {
-            soundEngine?.playChime('click');
-            onAddFirstMemory();
-          }}
-          className="w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-lotus-gold to-lotus-stamenGold text-lotus-forest font-bold text-xs shadow-gold-glow hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          <span>＋ Add First Memory</span>
-        </button>
+        <div className="flex flex-col sm:flex-row gap-2.5 pt-1">
+          <button
+            onClick={() => {
+              soundEngine?.playChime('click');
+              onAddFirstMemory();
+            }}
+            className="flex-1 py-3.5 px-6 rounded-full bg-gradient-to-r from-lotus-gold to-lotus-stamenGold text-lotus-forest font-bold text-xs shadow-gold-glow hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            <span>＋ Add First Memory</span>
+          </button>
+
+          {onExploreMap && (
+            <button
+              onClick={() => {
+                soundEngine?.playChime('click');
+                onExploreMap();
+              }}
+              className="py-3 px-5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-lotus-cream text-xs font-semibold transition-all hover:scale-105 active:scale-95"
+            >
+              Explore Map
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

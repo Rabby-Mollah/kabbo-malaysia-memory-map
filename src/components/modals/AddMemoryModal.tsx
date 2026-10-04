@@ -254,12 +254,7 @@ export default function AddMemoryModal({
       date,
       description: description || 'A memorable day in Malaysia.',
       rating,
-      photos:
-        photos.length > 0
-          ? photos
-          : [
-              'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=1200&q=80',
-            ],
+      photos: photos.length > 0 ? photos : [],
       tags,
       song: songTitle ? { title: songTitle, artist: songArtist || undefined } : undefined,
       unforgettable,

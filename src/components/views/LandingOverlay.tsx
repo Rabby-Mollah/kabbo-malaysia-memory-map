@@ -86,7 +86,7 @@ export default function LandingOverlay({
           </div>
           <div className="flex items-center gap-1.5">
             <Heart className="w-3.5 h-3.5 fill-lotus-rose text-lotus-rose" />
-            <span>{memoriesCount} Memories Pinned</span>
+            <span>{memoriesCount > 0 ? `${memoriesCount} Memories Pinned` : 'Ready for Memories'}</span>
           </div>
         </div>
 

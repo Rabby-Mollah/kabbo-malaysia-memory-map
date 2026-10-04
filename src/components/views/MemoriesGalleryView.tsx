@@ -136,7 +136,23 @@ export default function MemoriesGalleryView({
       {/* Cards Grid */}
       {filteredMemories.length === 0 ? (
         <div className="text-center py-16 p-8 rounded-3xl bg-lotus-pine/60 border border-lotus-rose/20 max-w-md mx-auto space-y-3">
-          <p className="text-sm text-lotus-cream/60">No memories found in this category.</p>
+          <p className="text-sm text-lotus-cream/60">
+            {memories.length === 0
+              ? 'Your photo album is fresh and ready for memories.'
+              : 'No memories found in this category.'}
+          </p>
+          {memories.length === 0 && (
+            <button
+              onClick={() => {
+                soundEngine?.playChime('click');
+                onAddNew();
+              }}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-gradient-to-r from-lotus-gold to-lotus-stamenGold text-lotus-forest text-xs font-bold shadow-gold-glow hover:scale-105 active:scale-95 transition-all"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Pin First Memory</span>
+            </button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">

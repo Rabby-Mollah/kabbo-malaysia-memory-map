@@ -69,8 +69,18 @@ export default function JourneyTimelineView({
         <div className="w-0.5 h-8 bg-gradient-to-b from-lotus-rose/50 to-lotus-gold/50 my-2" />
       </div>
 
-      {/* Timeline nodes */}
-      <div className="relative border-l-2 border-lotus-gold/30 ml-4 sm:ml-8 pl-6 sm:pl-10 space-y-12">
+      {/* Timeline nodes or empty state */}
+      {dates.length === 0 ? (
+        <div className="text-center py-12 p-8 rounded-3xl bg-lotus-pine/80 border border-lotus-rose/20 max-w-md mx-auto space-y-3">
+          <span className="text-3xl block">📖</span>
+          <h3 className="text-lg font-serif font-bold text-lotus-cream">Your timeline hasn&apos;t started yet</h3>
+          <p className="text-xs text-lotus-cream/70 max-w-sm mx-auto">
+            Pin your first location on the map to begin writing {friendName}&apos;s chronological Malaysia story.
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="relative border-l-2 border-lotus-gold/30 ml-4 sm:ml-8 pl-6 sm:pl-10 space-y-12">
         {dates.map((dateStr, dIdx) => {
           const dayMemories = grouped[dateStr];
           return (
@@ -204,6 +214,8 @@ export default function JourneyTimelineView({
           &ldquo;Some places become memories. Some memories become stories.&rdquo;
         </p>
       </div>
+    </>
+  )}
     </div>
   );
 }

@@ -8,24 +8,32 @@ import {
 import { syncToCloud } from './supabase';
 
 const STORAGE_KEYS = {
-  MEMORIES: 'malaysia_memories_v1',
+  MEMORIES: 'malaysia_memories_v2',
   PROFILE: 'malaysia_profile_v1',
   UNLOCKED_ACHIEVEMENTS: 'malaysia_achievements_v1',
+  FRESH_RESET: 'malaysia_memories_cleared_v2',
 };
 
 export function loadMemoriesFromStorage(): Memory[] {
-  if (typeof window === 'undefined') return DEFAULT_MEMORIES;
+  if (typeof window === 'undefined') return [];
   try {
+    // One-time fresh wipe so existing sessions receive the clean, fresh look
+    if (localStorage.getItem(STORAGE_KEYS.FRESH_RESET) !== 'true') {
+      localStorage.removeItem('malaysia_memories_v1');
+      localStorage.setItem(STORAGE_KEYS.MEMORIES, JSON.stringify([]));
+      localStorage.setItem(STORAGE_KEYS.FRESH_RESET, 'true');
+      return [];
+    }
+
     const raw = localStorage.getItem(STORAGE_KEYS.MEMORIES);
     if (!raw) {
-      // First run: save default sample memories so the user gets a stunning initial experience
-      localStorage.setItem(STORAGE_KEYS.MEMORIES, JSON.stringify(DEFAULT_MEMORIES));
-      return DEFAULT_MEMORIES;
+      localStorage.setItem(STORAGE_KEYS.MEMORIES, JSON.stringify([]));
+      return [];
     }
     return JSON.parse(raw);
   } catch (e) {
     console.error('Failed to load memories from localStorage', e);
-    return DEFAULT_MEMORIES;
+    return [];
   }
 }
 

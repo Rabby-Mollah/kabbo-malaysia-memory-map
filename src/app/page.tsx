@@ -80,6 +80,7 @@ function MainContent() {
   const [detailMemory, setDetailMemory] = useState<Memory | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
   const [isPersonalizeOpen, setIsPersonalizeOpen] = useState<boolean>(false);
+  const [isDismissedEmptyState, setIsDismissedEmptyState] = useState<boolean>(false);
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
   // Photo viewer modal state
@@ -229,7 +230,8 @@ function MainContent() {
 
   if (!isMounted) return null;
 
-  const showEmptyState = memories.length === 0 && !isLandingMode && activeTab === 'map';
+  const showEmptyState =
+    memories.length === 0 && !isLandingMode && activeTab === 'map' && !isDismissedEmptyState;
 
   return (
     <main className="relative w-screen h-screen overflow-hidden bg-[#062c21]">
@@ -336,6 +338,7 @@ function MainContent() {
                     setEditingMemory(null);
                     setIsAddModalOpen(true);
                   }}
+                  onExploreMap={() => setIsDismissedEmptyState(true)}
                   friendName={profile.friendName}
                 />
               )}
