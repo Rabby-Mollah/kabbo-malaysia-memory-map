@@ -35,8 +35,8 @@ class SoundEngine {
   }
 
   /**
-   * Initializes and plays "Cigarettes After Sex - Heavenly"
-   * Handles browser autoplay policy by listening for the first user interaction if blocked.
+   * Preloads "Cigarettes After Sex - Heavenly" without playing.
+   * Playback strictly starts when the user clicks "START MY JOURNEY" or toggles music.
    */
   public initHeavenly() {
     if (typeof window === 'undefined') return;
@@ -54,7 +54,7 @@ class SoundEngine {
         console.warn('Local heavenly.mp3 failed, falling back to CDN stream');
         audio.src =
           'https://traffic.omny.fm/d/clips/bad5d079-8dcb-4630-8770-aa090049131d/32b2ac38-5a48-4300-9fa6-aa40002038b5/e94ce646-0a16-4e94-8112-aace0011e860/audio.mp3';
-        if (!this.isMusicMuted) {
+        if (!this.isMusicMuted && this.isMusicPlaying) {
           audio.play().catch(() => {});
         }
       });
@@ -70,40 +70,6 @@ class SoundEngine {
       });
 
       this.heavenlyAudio = audio;
-
-      // Attempt immediate playback
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            this.isMusicPlaying = true;
-            this.notify();
-          })
-          .catch(() => {
-            // Autoplay was blocked by browser policy; wait for first interaction
-            this.isMusicPlaying = false;
-            this.notify();
-
-            const startOnInteraction = () => {
-              if (this.heavenlyAudio && !this.isMusicMuted) {
-                this.initContext();
-                this.heavenlyAudio.play().then(() => {
-                  this.isMusicPlaying = true;
-                  this.notify();
-                }).catch(() => {});
-              }
-              window.removeEventListener('pointerdown', startOnInteraction);
-              window.removeEventListener('touchstart', startOnInteraction);
-              window.removeEventListener('click', startOnInteraction);
-              window.removeEventListener('keydown', startOnInteraction);
-            };
-
-            window.addEventListener('pointerdown', startOnInteraction, { once: true, passive: true });
-            window.addEventListener('touchstart', startOnInteraction, { once: true, passive: true });
-            window.addEventListener('click', startOnInteraction, { once: true, passive: true });
-            window.addEventListener('keydown', startOnInteraction, { once: true, passive: true });
-          });
-      }
     } catch (err) {
       console.warn('Failed to initialize Heavenly audio:', err);
     }
@@ -118,6 +84,7 @@ class SoundEngine {
     if (this.heavenlyAudio) {
       this.heavenlyAudio.muted = this.isMusicMuted;
       if (!this.isMusicMuted && this.heavenlyAudio.paused) {
+        this.initContext();
         this.heavenlyAudio.play().then(() => {
           this.isMusicPlaying = true;
           this.notify();
@@ -144,13 +111,22 @@ class SoundEngine {
   }
 
   public playHeavenly() {
+    if (!this.heavenlyAudio) {
+      this.initHeavenly();
+    }
+    this.initContext();
+    this.isMusicMuted = false;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('kabbo_music_muted', 'false');
+    }
     if (this.heavenlyAudio) {
-      this.isMusicMuted = false;
       this.heavenlyAudio.muted = false;
       this.heavenlyAudio.play().then(() => {
         this.isMusicPlaying = true;
         this.notify();
-      }).catch(() => {});
+      }).catch((err) => {
+        console.warn('Playback error:', err);
+      });
     }
   }
 

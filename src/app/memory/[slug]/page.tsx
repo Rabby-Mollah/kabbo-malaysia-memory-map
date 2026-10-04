@@ -263,6 +263,7 @@ export default function SharedMemoryPage() {
           profile={profile}
           memoriesCount={memories.length}
           onStartJourney={() => {
+            soundEngine?.playHeavenly();
             setIsLandingMode(false);
             setActiveTab('map');
           }}

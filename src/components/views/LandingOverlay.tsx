@@ -17,6 +17,7 @@ export default function LandingOverlay({
   onStartJourney,
 }: LandingOverlayProps) {
   const handleStart = () => {
+    soundEngine?.playHeavenly();
     soundEngine?.playChime('achievement');
     onStartJourney();
   };

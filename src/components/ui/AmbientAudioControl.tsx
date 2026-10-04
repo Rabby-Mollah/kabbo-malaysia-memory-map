@@ -29,8 +29,12 @@ export default function AmbientAudioControl() {
   const handleToggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!soundEngine) return;
-    const muted = soundEngine.toggleMute();
-    setIsMuted(muted);
+    if (!isPlaying) {
+      soundEngine.playHeavenly();
+    } else {
+      soundEngine.toggleMute();
+    }
+    setIsMuted(soundEngine.getMuted());
     setIsPlaying(soundEngine.isPlaying());
   };
 
@@ -44,9 +48,11 @@ export default function AmbientAudioControl() {
           : 'bg-lotus-greenDeep/90 hover:bg-lotus-green text-lotus-cream/70 border-lotus-blush/25'
       }`}
       title={
-        isMuted
-          ? 'Unmute Cigarettes After Sex - Heavenly'
-          : 'Mute Cigarettes After Sex - Heavenly'
+        isPlaying
+          ? isMuted
+            ? 'Unmute Cigarettes After Sex - Heavenly'
+            : 'Mute Cigarettes After Sex - Heavenly'
+          : 'Play Cigarettes After Sex - Heavenly'
       }
     >
       {/* Dynamic Soundwave / Mute Icon */}
@@ -69,8 +75,10 @@ export default function AmbientAudioControl() {
             <span className="text-lotus-gold font-semibold">Heavenly</span>
             <span className="text-lotus-blush/80 hidden md:inline ml-1">• CAS</span>
           </>
-        ) : (
+        ) : isMuted ? (
           <span className="text-lotus-cream/60">Music Muted</span>
+        ) : (
+          <span className="text-lotus-cream/80">Play Music</span>
         )}
       </span>
     </button>
