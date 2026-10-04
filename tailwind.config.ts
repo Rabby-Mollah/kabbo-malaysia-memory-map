@@ -21,8 +21,11 @@ const config: Config = {
           green: "#0e4234",       // Signature Lotus pine green
           greenDeep: "#0a3025",   // Dark forest jade
           greenDark: "#06221a",   // Deepest lacquer green
+          forest: "#0a3025",      // Dark forest lacquer
+          pine: "#0e4234",        // Signature Lotus pine green
           gold: "#dfad40",        // Pollen seed pod gold
           goldLight: "#f3cb69",   // Golden stamen highlight
+          stamenGold: "#f3cb69",  // Golden stamen highlight
           moss: "#576b42",        // Botanical stem olive
         },
         malay: {

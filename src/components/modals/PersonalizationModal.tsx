@@ -67,8 +67,8 @@ export default function PersonalizationModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fade-in text-lotus-cream select-none">
-      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-3xl bg-lotus-forest/95 border border-lotus-rose/30 p-6 sm:p-8 shadow-glass-lg space-y-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-4 animate-fade-in text-lotus-cream select-none">
+      <div className="relative w-full max-w-lg max-h-[92vh] overflow-y-auto rounded-3xl bg-lotus-forest/98 border border-lotus-rose/30 p-5 sm:p-8 shadow-glass-lg space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-lotus-rose/15 pb-3">
           <div>

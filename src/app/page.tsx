@@ -323,7 +323,7 @@ function MainContent() {
 
           {/* OTHER TABS: Overlay scrollable glass cards on top of canvas */}
           {activeTab !== 'map' && (
-            <div className="absolute inset-0 z-10 overflow-y-auto pt-20 pb-20 bg-malay-emeraldDark/80 backdrop-blur-md">
+            <div className="absolute inset-0 z-10 overflow-y-auto pt-20 pb-32 sm:pb-24 bg-lotus-greenDark/90 backdrop-blur-md">
               {activeTab === 'journey' && (
                 <JourneyTimelineView
                   memories={memories}

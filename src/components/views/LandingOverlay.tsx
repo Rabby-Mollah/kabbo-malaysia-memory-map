@@ -22,12 +22,12 @@ export default function LandingOverlay({
   };
 
   return (
-    <div className="absolute inset-0 pointer-events-none z-30 flex flex-col justify-between p-6 md:p-12 bg-gradient-to-t from-lotus-greenDark/95 via-lotus-greenDeep/40 to-lotus-greenDark/70 backdrop-blur-[2px]">
+    <div className="absolute inset-0 pointer-events-none z-30 flex flex-col justify-between p-4 sm:p-6 md:p-12 bg-gradient-to-t from-lotus-greenDark/95 via-lotus-greenDeep/40 to-lotus-greenDark/70 backdrop-blur-[2px] overflow-hidden">
       {/* Top Header Tag */}
       <div className="flex items-center justify-between pointer-events-auto">
-        <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-lotus-greenDeep/90 backdrop-blur-xl border border-lotus-blush/30 text-lotus-cream shadow-glass">
-          <span className="w-2.5 h-2.5 rounded-full bg-lotus-rose animate-pulse" />
-          <span className="text-xs uppercase tracking-widest font-semibold text-lotus-blush">
+        <div className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-lotus-greenDeep/90 backdrop-blur-xl border border-lotus-blush/30 text-lotus-cream shadow-glass">
+          <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-lotus-rose animate-pulse" />
+          <span className="text-[10px] sm:text-xs uppercase tracking-widest font-semibold text-lotus-blush">
             🌸 Digital Keepsake • Sacred Botanical Edition
           </span>
         </div>
@@ -42,35 +42,35 @@ export default function LandingOverlay({
       </div>
 
       {/* Center Cinematic Hero Text */}
-      <div className="max-w-xl mx-auto text-center space-y-5 my-auto pointer-events-auto">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-lotus-blush/15 border border-lotus-rose/40 text-lotus-blush text-xs font-medium backdrop-blur-md">
+      <div className="max-w-xl mx-auto text-center space-y-3.5 sm:space-y-5 my-auto pointer-events-auto px-2">
+        <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-lotus-blush/15 border border-lotus-rose/40 text-lotus-blush text-[11px] sm:text-xs font-medium backdrop-blur-md">
           <Sparkles className="w-3.5 h-3.5 text-lotus-gold" />
           <span className="tracking-wider">{profile.tripDates} • An Interactive Story</span>
         </div>
 
-        <h1 className="text-5xl sm:text-7xl font-serif text-lotus-cream tracking-tight font-medium drop-shadow-md">
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-serif text-lotus-cream tracking-tight font-medium drop-shadow-md leading-tight">
           Malaysia Memory Map
         </h1>
 
-        <p className="text-lg sm:text-2xl text-lotus-blush/90 font-light italic font-serif max-w-md mx-auto">
+        <p className="text-base sm:text-xl md:text-2xl text-lotus-blush/90 font-light italic font-serif max-w-md mx-auto">
           &ldquo;{profile.subtitle}&rdquo;
         </p>
 
-        <p className="text-xs sm:text-sm text-lotus-cream/70 max-w-sm mx-auto leading-relaxed">
+        <p className="text-xs sm:text-sm text-lotus-cream/75 max-w-sm mx-auto leading-relaxed">
           {profile.dedicationMessage}
         </p>
 
         {/* Start Button */}
-        <div className="pt-4 flex flex-col items-center gap-3">
+        <div className="pt-2 sm:pt-4 flex flex-col items-center gap-2.5 sm:gap-3">
           <button
             onClick={handleStart}
-            className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-lotus-rose via-lotus-pink to-lotus-gold text-lotus-greenDark font-bold text-base shadow-rose-glow hover:scale-105 active:scale-95 transition-all duration-300 border border-lotus-blush/50"
+            className="group relative inline-flex items-center gap-2.5 sm:gap-3 px-6 sm:px-8 py-3.5 sm:py-4 rounded-full bg-gradient-to-r from-lotus-rose via-lotus-pink to-lotus-gold text-lotus-greenDark font-bold text-sm sm:text-base shadow-rose-glow hover:scale-105 active:scale-95 transition-all duration-300 border border-lotus-blush/50"
           >
             <span className="tracking-wide">START MY JOURNEY</span>
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
           </button>
 
-          <span className="text-[11px] text-lotus-blush/60 tracking-widest uppercase font-medium">
+          <span className="text-[10px] sm:text-[11px] text-lotus-blush/60 tracking-widest uppercase font-medium">
             Rotate • Zoom • Explore Malaysia
           </span>
         </div>

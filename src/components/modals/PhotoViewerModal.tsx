@@ -19,6 +19,7 @@ export default function PhotoViewerModal({
 }: PhotoViewerModalProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
   useEffect(() => {
     setCurrentIndex(initialIndex);
@@ -36,6 +37,24 @@ export default function PhotoViewerModal({
     setCurrentIndex((prev) => (prev - 1 + photos.length) % photos.length);
     setZoomLevel(1);
   }, [photos.length]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) {
+        handleNext();
+      } else {
+        handlePrev();
+      }
+    }
+    setTouchStartX(null);
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -107,7 +126,11 @@ export default function PhotoViewerModal({
       )}
 
       {/* Main Image Container */}
-      <div className="relative w-full h-full max-w-5xl max-h-[85vh] p-4 flex items-center justify-center overflow-hidden">
+      <div
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        className="relative w-full h-full max-w-5xl max-h-[85vh] p-2 sm:p-4 flex items-center justify-center overflow-hidden touch-pan-y"
+      >
         <div
           style={{ transform: `scale(${zoomLevel})`, transition: 'transform 0.2s ease-out' }}
           className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl"

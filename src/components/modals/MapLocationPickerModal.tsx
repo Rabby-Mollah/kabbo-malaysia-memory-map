@@ -130,15 +130,15 @@ export default function MapLocationPickerModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-6 animate-fade-in text-lotus-cream select-none">
-      <div className="relative w-full max-w-2xl h-[85vh] rounded-3xl bg-lotus-forest/98 border border-lotus-rose/30 shadow-glass-lg flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-2 sm:p-6 animate-fade-in text-lotus-cream select-none">
+      <div className="relative w-full max-w-2xl h-[90vh] sm:h-[85vh] rounded-3xl bg-lotus-forest/98 border border-lotus-rose/30 shadow-glass-lg flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="p-4 sm:p-5 flex items-center justify-between border-b border-lotus-rose/15 shrink-0">
+        <div className="p-3.5 sm:p-5 flex items-center justify-between border-b border-lotus-rose/15 shrink-0">
           <div>
             <span className="text-[10px] uppercase tracking-wider font-bold text-lotus-gold block">
               Real-Time Location Picker
             </span>
-            <h3 className="text-lg sm:text-xl font-serif font-bold text-lotus-cream">
+            <h3 className="text-base sm:text-xl font-serif font-bold text-lotus-cream truncate max-w-[230px] sm:max-w-none">
               Tap Anywhere in Malaysia to Drop a Pin
             </h3>
           </div>
@@ -161,21 +161,21 @@ export default function MapLocationPickerModal({
         </div>
 
         {/* Footer Selected Place Info & Confirm Button */}
-        <div className="p-4 sm:p-5 bg-lotus-pine/95 border-t border-lotus-rose/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-lotus-gold/20 flex items-center justify-center text-lotus-gold shrink-0">
-              <MapPin className="w-5 h-5" />
+        <div className="p-3.5 sm:p-5 bg-lotus-pine/95 border-t border-lotus-rose/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-lotus-gold/20 flex items-center justify-center text-lotus-gold shrink-0">
+              <MapPin className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-serif font-bold text-lotus-cream">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="text-xs sm:text-sm font-serif font-bold text-white truncate max-w-[180px] sm:max-w-sm block">
                   {placeName}
                 </span>
                 {isReverseGeocoding && (
-                  <Loader2 className="w-3.5 h-3.5 text-lotus-gold animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 text-lotus-gold animate-spin shrink-0" />
                 )}
               </div>
-              <span className="text-xs text-lotus-cream/60">
+              <span className="text-[10px] sm:text-xs text-lotus-cream/70 truncate block max-w-[200px] sm:max-w-sm">
                 {placeState} • {currentLat.toFixed(4)}° N, {currentLng.toFixed(4)}° E
               </span>
             </div>

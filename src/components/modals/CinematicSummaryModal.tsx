@@ -62,8 +62,8 @@ export default function CinematicSummaryModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-2xl p-4 animate-fade-in text-lotus-cream select-none">
-      <div className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-3xl bg-gradient-to-b from-lotus-greenDark via-lotus-greenDeep to-[#041a13] border-2 border-lotus-blush/35 p-6 sm:p-10 shadow-2xl space-y-8 text-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-2xl p-3 sm:p-4 animate-fade-in text-lotus-cream select-none">
+      <div className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-3xl bg-gradient-to-b from-lotus-greenDark via-lotus-greenDeep to-[#041a13] border-2 border-lotus-blush/35 p-5 sm:p-10 shadow-2xl space-y-6 sm:space-y-8 text-center">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -73,17 +73,17 @@ export default function CinematicSummaryModal({
         </button>
 
         {/* Crown Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-lotus-blush/15 border border-lotus-rose/50 text-lotus-blush text-xs font-bold tracking-widest uppercase shadow-rose-glow">
+        <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-lotus-blush/15 border border-lotus-rose/50 text-lotus-blush text-[11px] sm:text-xs font-bold tracking-widest uppercase shadow-rose-glow">
           <Sparkles className="w-3.5 h-3.5 text-lotus-gold" />
           <span>SACRED KEEPSAKE EMBLEM</span>
         </div>
 
         {/* Hero Title */}
-        <div className="space-y-2">
-          <h1 className="text-4xl sm:text-6xl font-serif font-bold text-lotus-cream tracking-tight uppercase">
+        <div className="space-y-1.5 sm:space-y-2">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-serif font-bold text-lotus-cream tracking-tight uppercase">
             {profile.friendName}&apos;s Malaysia
           </h1>
-          <p className="text-lg sm:text-xl text-lotus-blush font-serif italic">
+          <p className="text-base sm:text-xl text-lotus-blush font-serif italic">
             {profile.tripDates}
           </p>
         </div>

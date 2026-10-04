@@ -22,7 +22,7 @@ export default function UnforgettableView({
   const unforgettableList = memories.filter((m) => m.unforgettable);
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 py-8 pb-28 text-lotus-cream space-y-10 animate-fade-in">
+    <div className="w-full max-w-5xl mx-auto px-4 py-8 pb-28 text-lotus-cream space-y-10 animate-fade-in overflow-x-hidden">
       {/* Header */}
       <div className="text-center space-y-3">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-lotus-blush/20 border border-lotus-rose/50 text-lotus-blush text-xs font-semibold backdrop-blur-md">
@@ -49,9 +49,9 @@ export default function UnforgettableView({
         </div>
       ) : (
         /* Floating Polaroid Cards Grid styled like the Lotus editorial poster */
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 px-1">
           {unforgettableList.map((mem, idx) => {
-            const rotationAngles = [-2, 1.5, -1, 2, -1.8, 1.2];
+            const rotationAngles = [-1.5, 1.2, -1, 1.5, -1.2, 1];
             const rot = rotationAngles[idx % rotationAngles.length];
 
             return (
@@ -62,7 +62,7 @@ export default function UnforgettableView({
                   onOpenDetails(mem);
                 }}
                 style={{
-                  transform: `rotate(${rot}deg)`,
+                  transform: typeof window !== 'undefined' && window.innerWidth < 640 ? 'none' : `rotate(${rot}deg)`,
                 }}
                 className="group relative cursor-pointer bg-lotus-cream text-lotus-greenDeep p-4 pb-6 rounded-2xl shadow-2xl hover:shadow-lotus-glow hover:scale-105 hover:rotate-0 transition-all duration-300 border border-lotus-sand/60"
               >

@@ -35,7 +35,7 @@ export default function MemoryDetailModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-6 animate-fade-in">
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-lotus-forest/95 border border-lotus-rose/30 text-lotus-cream shadow-glass-lg p-5 sm:p-8 space-y-6">
+      <div className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-3xl bg-lotus-forest/98 border border-lotus-rose/30 text-lotus-cream shadow-glass-lg p-4 sm:p-8 space-y-5 sm:space-y-6">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -49,7 +49,7 @@ export default function MemoryDetailModal({
           <div className="space-y-2">
             <div
               onClick={() => onOpenPhotos(memory.photos, 0)}
-              className="relative h-64 sm:h-80 w-full rounded-2xl overflow-hidden cursor-pointer group border border-lotus-rose/20 shadow-md"
+              className="relative h-52 sm:h-80 w-full rounded-2xl overflow-hidden cursor-pointer group border border-lotus-rose/20 shadow-md"
             >
               <Image
                 src={memory.photos[0]}

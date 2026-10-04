@@ -27,8 +27,8 @@ export default function MemoryCardHUD({
   };
 
   return (
-    <div className="absolute bottom-20 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-24 sm:w-96 z-30 animate-fade-in pointer-events-auto">
-      <div className="relative rounded-3xl overflow-hidden bg-lotus-greenDeep/95 backdrop-blur-2xl border border-lotus-blush/30 shadow-glass-lg text-lotus-cream">
+    <div className="absolute bottom-24 left-3 right-3 sm:left-auto sm:right-6 sm:bottom-24 sm:w-96 z-30 max-h-[75vh] flex flex-col animate-fade-in pointer-events-auto">
+      <div className="relative rounded-3xl overflow-hidden bg-lotus-greenDeep/95 backdrop-blur-2xl border border-lotus-blush/30 shadow-glass-lg text-lotus-cream max-h-[75vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={() => {
@@ -44,7 +44,7 @@ export default function MemoryCardHUD({
         {memory.photos && memory.photos.length > 0 && (
           <div
             onClick={() => onOpenPhotos(memory.photos, 0)}
-            className="relative h-44 w-full cursor-pointer group overflow-hidden"
+            className="relative h-36 sm:h-44 w-full cursor-pointer group overflow-hidden"
           >
             <Image
               src={memory.photos[0]}

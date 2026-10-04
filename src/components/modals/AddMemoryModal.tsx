@@ -70,6 +70,22 @@ export default function AddMemoryModal({
   const [isUploading, setIsUploading] = useState<boolean>(false);
 
   const searchDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  // Close search suggestions on click/touch outside
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent | TouchEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setShowSearchResults(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('touchstart', handleOutsideClick);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('touchstart', handleOutsideClick);
+    };
+  }, []);
 
   // Real-time geocoding search as user types
   useEffect(() => {
@@ -258,7 +274,7 @@ export default function AddMemoryModal({
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-md p-0 sm:p-4 animate-fade-in select-none">
-        <div className="relative w-full max-w-xl max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-lotus-forest/95 border border-lotus-rose/30 text-lotus-cream shadow-glass-lg p-5 sm:p-7 space-y-6">
+        <div className="relative w-full max-w-xl max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-lotus-forest/98 border border-lotus-rose/30 text-lotus-cream shadow-glass-lg p-4 sm:p-7 space-y-5 sm:space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between pb-3 border-b border-lotus-rose/15">
             <div>
@@ -324,9 +340,9 @@ export default function AddMemoryModal({
               </div>
 
               {/* Real-time Search Box */}
-              <div className="relative">
+              <div ref={searchContainerRef} className="relative">
                 <div className="relative flex items-center">
-                  <Search className="absolute left-3.5 w-4 h-4 text-lotus-cream/40 pointer-events-none" />
+                  <Search className="absolute left-3.5 w-4 h-4 text-lotus-cream/50 pointer-events-none" />
                   <input
                     type="text"
                     required
@@ -339,37 +355,72 @@ export default function AddMemoryModal({
                     onFocus={() => {
                       if (searchResults.length > 0) setShowSearchResults(true);
                     }}
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-black/20 border border-lotus-rose/25 text-lotus-cream placeholder-lotus-cream/40 text-sm focus:outline-none focus:border-lotus-gold"
+                    className="w-full pl-10 pr-16 py-2.5 rounded-xl bg-black/40 border border-lotus-rose/30 text-white placeholder-lotus-cream/40 text-sm focus:outline-none focus:border-lotus-gold focus:ring-1 focus:ring-lotus-gold/50 shadow-inner"
                   />
-                  {isSearching && (
-                    <Loader2 className="absolute right-3.5 w-4 h-4 text-lotus-gold animate-spin" />
-                  )}
+                  <div className="absolute right-3 flex items-center gap-1.5">
+                    {isSearching && (
+                      <Loader2 className="w-4 h-4 text-lotus-gold animate-spin" />
+                    )}
+                    {searchQuery.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSearchQuery('');
+                          setShowSearchResults(false);
+                        }}
+                        className="p-1 rounded-full text-lotus-cream/70 hover:text-white hover:bg-white/10 transition-colors"
+                        title="Clear search"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Live Real-time Suggestions Dropdown */}
                 {showSearchResults && searchResults.length > 0 && (
-                  <div className="absolute left-0 right-0 top-12 z-40 max-h-56 overflow-y-auto rounded-2xl bg-lotus-forest/98 border border-lotus-rose/30 shadow-2xl p-1.5 space-y-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-lotus-gold px-2 py-1 block">
-                      Live Malaysia Search Results
-                    </span>
+                  <div className="absolute left-0 right-0 top-12 z-50 max-h-64 overflow-y-auto rounded-2xl bg-[#06221a] border-2 border-lotus-gold/60 shadow-[0_16px_50px_rgba(0,0,0,0.95)] p-2 space-y-1.5">
+                    <div className="flex items-center justify-between px-2 py-1 border-b border-lotus-rose/25 pb-1.5 mb-1">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-lotus-gold flex items-center gap-1.5">
+                        <span>🇲🇾</span>
+                        <span>Matching Places ({searchResults.length})</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setShowSearchResults(false)}
+                        className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-white/10 text-lotus-blush hover:text-white hover:bg-white/20 transition-colors"
+                      >
+                        ✕ Close
+                      </button>
+                    </div>
                     {searchResults.map((item, idx) => (
                       <button
                         key={idx}
                         type="button"
                         onClick={() => handleSelectSearchResult(item)}
-                        className="w-full p-2 rounded-xl hover:bg-white/10 text-left transition-colors flex items-start gap-2.5"
+                        className="w-full p-2.5 rounded-xl bg-[#0e4234] hover:bg-[#165845] active:bg-[#1f735b] border border-lotus-gold/25 text-left transition-all flex items-start gap-2.5 shadow-sm group"
                       >
-                        <MapPin className="w-4 h-4 text-lotus-gold shrink-0 mt-0.5" />
-                        <div className="truncate">
-                          <span className="text-xs font-semibold text-lotus-cream block truncate">
+                        <div className="w-7 h-7 rounded-lg bg-lotus-gold/20 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-lotus-gold/30">
+                          <MapPin className="w-4 h-4 text-lotus-gold" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <span className="text-xs sm:text-sm font-bold text-white block truncate leading-snug">
                             {item.name}
                           </span>
-                          <span className="text-[11px] text-lotus-blush/60 block truncate">
+                          <span className="text-[11px] text-lotus-blush font-medium block truncate mt-0.5 opacity-90">
                             {item.displayName}
                           </span>
                         </div>
                       </button>
                     ))}
+                  </div>
+                )}
+
+                {/* Empty State when no results found */}
+                {showSearchResults && !isSearching && searchQuery.trim().length > 2 && searchResults.length === 0 && (
+                  <div className="absolute left-0 right-0 top-12 z-50 rounded-2xl bg-[#06221a] border-2 border-lotus-rose/40 shadow-2xl p-3.5 text-center space-y-1">
+                    <p className="text-xs text-white font-semibold">No places found matching &ldquo;{searchQuery}&rdquo;</p>
+                    <p className="text-[11px] text-lotus-blush/80">You can still save this as a custom location or tap &ldquo;Pick on Real Map&rdquo; above.</p>
                   </div>
                 )}
               </div>

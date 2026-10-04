@@ -28,8 +28,8 @@ export function MobileBottomNav({
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 p-2 sm:p-3 pointer-events-none lg:hidden">
-      <div className="max-w-md mx-auto rounded-3xl bg-lotus-greenDeep/95 backdrop-blur-2xl border border-lotus-blush/25 shadow-glass-lg p-1.5 flex items-center justify-between pointer-events-auto">
+    <div className="fixed bottom-0 left-0 right-0 z-40 px-2 sm:px-3 pt-1 pb-[max(0.5rem,env(safe-area-inset-bottom))] pointer-events-none lg:hidden">
+      <div className="max-w-md mx-auto rounded-3xl bg-lotus-greenDeep/95 backdrop-blur-2xl border border-lotus-blush/25 shadow-glass-lg p-1 sm:p-1.5 flex items-center justify-between pointer-events-auto">
         {tabs.slice(0, 3).map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -40,12 +40,12 @@ export function MobileBottomNav({
                 soundEngine?.playChime('click');
                 onChangeTab(tab.id);
               }}
-              className={`flex-1 py-1.5 flex flex-col items-center justify-center transition-all ${
-                isActive ? 'text-lotus-rose font-bold scale-105' : 'text-lotus-cream/60 hover:text-lotus-cream'
+              className={`flex-1 py-1 sm:py-1.5 flex flex-col items-center justify-center transition-all min-w-0 ${
+                isActive ? 'text-lotus-gold font-bold scale-105' : 'text-lotus-cream/70 hover:text-white'
               }`}
             >
-              <Icon className={`w-4 h-4 mb-0.5 ${isActive ? 'stroke-[2.5]' : 'stroke-2'}`} />
-              <span className="text-[10px] tracking-tight">{tab.label}</span>
+              <Icon className={`w-4 h-4 mb-0.5 ${isActive ? 'stroke-[2.5] text-lotus-gold' : 'stroke-2'}`} />
+              <span className="text-[10px] tracking-tight truncate block max-w-full px-0.5">{tab.label}</span>
             </button>
           );
         })}
@@ -57,7 +57,7 @@ export function MobileBottomNav({
               soundEngine?.playChime('click');
               onAddNew();
             }}
-            className="w-11 h-11 mx-1 rounded-2xl bg-gradient-to-tr from-lotus-rose via-lotus-pink to-lotus-gold text-lotus-greenDark flex items-center justify-center shadow-rose-glow hover:scale-105 active:scale-95 transition-all shrink-0 border border-lotus-blush/40"
+            className="w-10 h-10 sm:w-11 sm:h-11 mx-0.5 sm:mx-1 rounded-2xl bg-gradient-to-tr from-lotus-rose via-lotus-pink to-lotus-gold text-lotus-greenDark flex items-center justify-center shadow-rose-glow hover:scale-105 active:scale-95 transition-all shrink-0 border border-lotus-blush/40"
             title="Add Memory"
           >
             <Plus className="w-5 h-5 stroke-[2.5]" />
@@ -74,12 +74,12 @@ export function MobileBottomNav({
                 soundEngine?.playChime('click');
                 onChangeTab(tab.id);
               }}
-              className={`flex-1 py-1.5 flex flex-col items-center justify-center transition-all ${
-                isActive ? 'text-lotus-rose font-bold scale-105' : 'text-lotus-cream/60 hover:text-lotus-cream'
+              className={`flex-1 py-1 sm:py-1.5 flex flex-col items-center justify-center transition-all min-w-0 ${
+                isActive ? 'text-lotus-gold font-bold scale-105' : 'text-lotus-cream/70 hover:text-white'
               }`}
             >
-              <Icon className={`w-4 h-4 mb-0.5 ${isActive ? 'stroke-[2.5]' : 'stroke-2'}`} />
-              <span className="text-[10px] tracking-tight">{tab.label}</span>
+              <Icon className={`w-4 h-4 mb-0.5 ${isActive ? 'stroke-[2.5] text-lotus-gold' : 'stroke-2'}`} />
+              <span className="text-[10px] tracking-tight truncate block max-w-full px-0.5">{tab.label}</span>
             </button>
           );
         })}

@@ -37,7 +37,7 @@ export default function AppHeader({
         >
           <span className="text-base sm:text-lg">🌸</span>
           <div className="text-left">
-            <span className="font-serif font-bold text-xs sm:text-sm text-lotus-cream tracking-tight block">
+            <span className="font-serif font-bold text-xs sm:text-sm text-lotus-cream tracking-tight block max-w-[110px] sm:max-w-none truncate">
               {profile.tripTitle}
             </span>
             <span className="text-[9px] sm:text-[10px] text-lotus-blush uppercase tracking-wider hidden sm:block">
@@ -52,7 +52,7 @@ export default function AppHeader({
               soundEngine?.playChime('click');
               onOpenPersonalize();
             }}
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-lotus-greenDeep/90 hover:bg-lotus-green backdrop-blur-xl border border-lotus-blush/25 flex items-center justify-center text-lotus-blush hover:text-white transition-all shadow-glass"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-lotus-greenDeep/90 hover:bg-lotus-green backdrop-blur-xl border border-lotus-blush/25 flex items-center justify-center text-lotus-blush hover:text-white transition-all shadow-glass shrink-0"
             title="Personalize & Cloud Keys"
           >
             <Settings className="w-4 h-4" />
@@ -61,7 +61,7 @@ export default function AppHeader({
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-2 pointer-events-auto">
+      <div className="flex items-center gap-1.5 sm:gap-2 pointer-events-auto">
         {/* Ambient Sound control */}
         <AmbientAudioControl />
 
@@ -71,7 +71,7 @@ export default function AppHeader({
             soundEngine?.playChime('click');
             onOpenShare();
           }}
-          className="p-2 sm:px-3 sm:py-1.5 rounded-full bg-lotus-greenDeep/90 hover:bg-lotus-green backdrop-blur-xl border border-lotus-blush/25 text-lotus-cream shadow-glass flex items-center gap-1.5 text-xs font-medium transition-all"
+          className="p-1.5 sm:px-3 sm:py-1.5 rounded-full bg-lotus-greenDeep/90 hover:bg-lotus-green backdrop-blur-xl border border-lotus-blush/25 text-lotus-cream shadow-glass flex items-center gap-1.5 text-xs font-medium transition-all"
           title="Share memory link"
         >
           <Share2 className="w-4 h-4 text-lotus-gold" />
@@ -84,10 +84,10 @@ export default function AppHeader({
             soundEngine?.playChime('click');
             onOpenSummary();
           }}
-          className="px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-lotus-rose via-lotus-pink to-lotus-gold text-lotus-greenDark font-bold text-xs shadow-rose-glow hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 border border-lotus-blush/40"
+          className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-lotus-rose via-lotus-pink to-lotus-gold text-lotus-greenDark font-bold text-xs shadow-rose-glow hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 border border-lotus-blush/40"
         >
-          <Sparkles className="w-3.5 h-3.5 text-lotus-greenDark" />
-          <span className="hidden xs:inline sm:inline">Complete Journey</span>
+          <Sparkles className="w-3.5 h-3.5 text-lotus-greenDark shrink-0" />
+          <span className="hidden sm:inline">Complete Journey</span>
         </button>
 
         {/* Add Memory quick button (desktop) */}
